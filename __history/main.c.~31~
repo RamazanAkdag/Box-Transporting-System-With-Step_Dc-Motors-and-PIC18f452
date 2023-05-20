@@ -1,0 +1,84 @@
+#include <main.h>
+
+
+/*m1 dönecek s3 butonuna basýlýnca bandýn sonuna gelmiþ demektir m2 baþta onu bekliyor kabul edelim 
+m5 60 derece dönerek aþaðý inecek ve kavrama için m4 90 derece dönecek
+m5 tekrar 60 derece dönerek yukarý çýkacak 
+sonra m2 90 derece dönecek ve diðre banda gelecek
+sonra m5 60 derece aþaðý inecek ve m4 90 derece dönerek kutuyu býrakacak
+sonra s4 butonuna basýlana kadar m3 bandý hareket edecek
+sonra m5 tekrar 60 derece yukarý kalkacak ve m2 tekrar 90 derece dönerek eski yerine gelecek
+ve sistem tekrar edecek*/
+
+//s3 Butonu A0 a baðlý
+//s4 butonu A1 e baðlý
+
+//fonksiyonlara ayýr kafan rahat olsun
+int adim[] = {0b00000001,0b00000011,0b00000010,0b00000110,0b00000100,0b00001100,0b00001000,0b00001001};//0. pinden 
+int adim2[] = {0b00000001,0b00000011,0b00000010,0b00000110,0b00000100,0b00001100,0b00001000,0b00001001};//bunun bitleri kaydýrýlarak diðer step motora uydurulacak
+//0b00000101 ileri  Dc motor 3 bit kaydýrýlacak
+int mbirIleri = 0b00000101;
+int mUcIleri =  0b00000101 << 3;
+int adimBuyuklugu = 30,sayac2;
+
+void omuzIleri(){
+
+}
+void omuzGeri(){
+
+}
+void m1BandiCalistir(){
+   output_b(mbirIleri);
+}
+void BandiDurdur(){
+   output_b(0x00);
+}
+void m3BandiCalistir(){
+   output_b(mUcIleri);
+}
+void dirsekAsagi(){
+   for(int sayac = 0 ; sayac < adimBuyuklugu; sayac++){
+        sayac2 = sayac%8;
+        output_c(adim[sayac2]);
+       delay_ms(150);
+      }
+
+}
+void dirsekYukari(){
+
+}
+void kistir(){
+
+}
+void kistirma(){
+
+}
+
+
+void main()
+{
+set_tris_a(0xff);
+set_tris_b(0x00);
+set_tris_c(0x00);
+set_tris_d(0x00);
+output_b(0x00);
+output_c(0x00);
+output_d(0x00);
+
+
+
+  // while(TRUE)
+  // {
+      //m1BandiCalistir();
+      //while(input(pin_A0) == 0);//sensör kutuyu algýlayana kadar bekle
+     // delay_us(200);//algýlandý
+      //BandiDurdur();
+      dirsekAsagi();
+      
+      
+      
+    
+  // }
+}
+
+

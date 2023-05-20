@@ -1,0 +1,4 @@
+>>> Warning 202 "main.c" Line 24(5,17): Variable never used:   kapanmaAcisi
+      Memory usage:   ROM=2%      RAM=2% - 2%
+      0 Errors,  1 Warnings.
+Build Successful.

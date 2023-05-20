@@ -1,0 +1,424 @@
+CCS PCH C Compiler, Version 5.007, 61971               20-May-23 15:05
+
+               Filename:   D:\programmerRamoFinallyStarted\PIC_C\ders\stepDcKolUygulamasý\main.lst
+
+               ROM used:   554 bytes (2%)
+                           Largest free fragment is 32214
+               RAM used:   27 (2%) at main() level
+                           28 (2%) worst case
+               Stack used: 0 locations
+               Stack size: 31
+
+*
+0000:  GOTO   017A
+.................... #include <main.h> 
+.................... #include <18F452.h> 
+.................... //////// Standard Header file for the PIC18F452 device //////////////// 
+.................... #device PIC18F452 
+....................  
+.................... #list 
+....................  
+.................... #device ADC=16 
+....................  
+.................... #FUSES NOWDT                 	//No Watch Dog Timer 
+.................... #FUSES WDT128                	//Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES NOBROWNOUT            	//No brownout reset 
+.................... #FUSES NOLVP                 	//No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(crystal=4MHz) 
+*
+0014:  CLRF   FEA
+0016:  MOVLW  1B
+0018:  MOVWF  FE9
+001A:  MOVF   FEF,W
+001C:  BZ    003A
+001E:  MOVLW  01
+0020:  MOVWF  01
+0022:  CLRF   00
+0024:  DECFSZ 00,F
+0026:  BRA    0024
+0028:  DECFSZ 01,F
+002A:  BRA    0022
+002C:  MOVLW  4A
+002E:  MOVWF  00
+0030:  DECFSZ 00,F
+0032:  BRA    0030
+0034:  BRA    0036
+0036:  DECFSZ FEF,F
+0038:  BRA    001E
+003A:  RETURN 0
+.................... #use STANDARD_IO( A ) 
+.................... #use FIXED_IO( B_outputs=PIN_B7,PIN_B6,PIN_B5,PIN_B4,PIN_B3,PIN_B2,PIN_B1,PIN_B0 ) 
+.................... #use FIXED_IO( C_outputs=PIN_C7,PIN_C6,PIN_C5,PIN_C4,PIN_C3,PIN_C2,PIN_C1,PIN_C0 ) 
+.................... #use FIXED_IO( D_outputs=PIN_D7,PIN_D6,PIN_D5,PIN_D4,PIN_D3,PIN_D2,PIN_D1,PIN_D0 ) 
+....................  
+....................  
+....................  
+....................  
+.................... /*m1 dönecek s3 butonuna basýlýnca bandýn sonuna gelmiþ demektir m2 baþta onu bekliyor kabul edelim  
+.................... m5 60 derece dönerek aþaðý inecek ve kavrama için m4 90 derece dönecek 
+.................... m5 tekrar 60 derece dönerek yukarý çýkacak  
+.................... sonra m2 90 derece dönecek ve diðre banda gelecek 
+.................... sonra m5 60 derece aþaðý inecek ve m4 90 derece dönerek kutuyu býrakacak 
+.................... sonra s4 butonuna basýlana kadar m3 bandý hareket edecek 
+.................... sonra m5 tekrar 60 derece yukarý kalkacak ve m2 tekrar 90 derece dönerek eski yerine gelecek 
+.................... ve sistem tekrar edecek*/ 
+....................  
+.................... //s3 Butonu A0 a baðlý 
+.................... //s4 butonu A1 e baðlý 
+....................  
+.................... //fonksiyonlara ayýr kafan rahat olsun 
+.................... int adim[] = {0b00000001,0b00000011,0b00000010,0b00000110,0b00000100,0b00001100,0b00001000,0b00001001};//0. pinden  
+.................... int adim2[] = {0b00010000,0b00110000,0b00100000,0b01100000,0b01000000,0b11000000,0b10000000,0b10010000};//bunun bitleri kaydýrýlarak diðer step motora uydurulacak 
+.................... //0b00000101 ileri  Dc motor 3 bit kaydýrýlacak 
+.................... int mbirIleri = 0b00000101; 
+.................... int mUcIleri =  0b00000101 << 3; 
+.................... int dirsekAdimBuyuklugu = 40,sayac2; 
+.................... int omuzAdimBuyuklugu = 60; 
+.................... int kapanmaAcisi = 60; 
+....................  
+.................... void omuzIleri(){ 
+....................       for(int sayac = 0 ; sayac < omuzAdimBuyuklugu; sayac++){ 
+*
+00D4:  CLRF   1A
+00D6:  MOVF   18,W
+00D8:  SUBWF  1A,W
+00DA:  BC    0104
+....................         sayac2 = sayac%8; 
+00DC:  MOVF   1A,W
+00DE:  ANDLW  07
+00E0:  MOVWF  17
+....................         output_d(adim[sayac2]); 
+00E2:  CLRF   03
+00E4:  MOVF   17,W
+00E6:  ADDLW  04
+00E8:  MOVWF  FE9
+00EA:  MOVLW  00
+00EC:  ADDWFC 03,W
+00EE:  MOVWF  FEA
+00F0:  MOVFF  FEF,1B
+00F4:  CLRF   F95
+00F6:  MOVFF  1B,F8C
+....................        delay_ms(50); 
+00FA:  MOVLW  32
+00FC:  MOVWF  1B
+00FE:  RCALL  0014
+0100:  INCF   1A,F
+0102:  BRA    00D6
+....................       } 
+0104:  GOTO   020A (RETURN)
+.................... } 
+.................... void omuzGeri(){ 
+....................       for(int sayac = omuzAdimBuyuklugu ; sayac > 0 ; sayac--){ 
+*
+0146:  MOVFF  18,1A
+014A:  MOVF   1A,F
+014C:  BZ    0176
+....................         sayac2 = sayac%8; 
+014E:  MOVF   1A,W
+0150:  ANDLW  07
+0152:  MOVWF  17
+....................         output_d(adim[sayac2]); 
+0154:  CLRF   03
+0156:  MOVF   17,W
+0158:  ADDLW  04
+015A:  MOVWF  FE9
+015C:  MOVLW  00
+015E:  ADDWFC 03,W
+0160:  MOVWF  FEA
+0162:  MOVFF  FEF,1B
+0166:  CLRF   F95
+0168:  MOVFF  1B,F8C
+....................        delay_ms(50); 
+016C:  MOVLW  32
+016E:  MOVWF  1B
+0170:  RCALL  0014
+0172:  DECF   1A,F
+0174:  BRA    014A
+....................       } 
+0176:  GOTO   0214 (RETURN)
+....................  
+.................... } 
+.................... void m1BandiCalistir(){ 
+....................    output_b(mbirIleri); 
+*
+0004:  CLRF   F93
+0006:  MOVFF  14,F8A
+000A:  GOTO   01F0 (RETURN)
+.................... } 
+.................... void BandiDurdur(){ 
+....................    output_b(0x00); 
+000E:  CLRF   F93
+0010:  CLRF   F8A
+0012:  RETURN 0
+.................... } 
+.................... void m3BandiCalistir(){ 
+....................    output_b(mUcIleri); 
+*
+013C:  CLRF   F93
+013E:  MOVFF  15,F8A
+0142:  GOTO   0212 (RETURN)
+.................... } 
+.................... void dirsekAsagi(){ 
+....................    for(int sayac = 0 ; sayac < dirsekAdimBuyuklugu; sayac++){ 
+*
+003C:  CLRF   1A
+003E:  MOVF   16,W
+0040:  SUBWF  1A,W
+0042:  BC    006C
+....................         sayac2 = sayac%8; 
+0044:  MOVF   1A,W
+0046:  ANDLW  07
+0048:  MOVWF  17
+....................         output_c(adim[sayac2]); 
+004A:  CLRF   03
+004C:  MOVF   17,W
+004E:  ADDLW  04
+0050:  MOVWF  FE9
+0052:  MOVLW  00
+0054:  ADDWFC 03,W
+0056:  MOVWF  FEA
+0058:  MOVFF  FEF,1B
+005C:  CLRF   F94
+005E:  MOVFF  1B,F8B
+....................        delay_ms(50); 
+0062:  MOVLW  32
+0064:  MOVWF  1B
+0066:  RCALL  0014
+0068:  INCF   1A,F
+006A:  BRA    003E
+....................       } 
+006C:  RETURN 0
+....................  
+.................... } 
+.................... void dirsekYukari(){ 
+....................     for(int sayac = dirsekAdimBuyuklugu ; sayac > 0 ; sayac--){ 
+*
+00A2:  MOVFF  16,1A
+00A6:  MOVF   1A,F
+00A8:  BZ    00D2
+....................         sayac2 = sayac%8; 
+00AA:  MOVF   1A,W
+00AC:  ANDLW  07
+00AE:  MOVWF  17
+....................         output_c(adim[sayac2]); 
+00B0:  CLRF   03
+00B2:  MOVF   17,W
+00B4:  ADDLW  04
+00B6:  MOVWF  FE9
+00B8:  MOVLW  00
+00BA:  ADDWFC 03,W
+00BC:  MOVWF  FEA
+00BE:  MOVFF  FEF,1B
+00C2:  CLRF   F94
+00C4:  MOVFF  1B,F8B
+....................        delay_ms(50); 
+00C8:  MOVLW  32
+00CA:  MOVWF  1B
+00CC:  RCALL  0014
+00CE:  DECF   1A,F
+00D0:  BRA    00A6
+....................       } 
+00D2:  RETURN 0
+.................... } 
+.................... void kistir(){ 
+....................   for(int sayac = 0 ; sayac < dirsekAdimBuyuklugu; sayac++){ 
+*
+006E:  CLRF   1A
+0070:  MOVF   16,W
+0072:  SUBWF  1A,W
+0074:  BC    009E
+....................         sayac2 = sayac%8; 
+0076:  MOVF   1A,W
+0078:  ANDLW  07
+007A:  MOVWF  17
+....................         output_c(adim2[sayac2]); 
+007C:  CLRF   03
+007E:  MOVF   17,W
+0080:  ADDLW  0C
+0082:  MOVWF  FE9
+0084:  MOVLW  00
+0086:  ADDWFC 03,W
+0088:  MOVWF  FEA
+008A:  MOVFF  FEF,1B
+008E:  CLRF   F94
+0090:  MOVFF  1B,F8B
+....................        delay_ms(50); 
+0094:  MOVLW  32
+0096:  MOVWF  1B
+0098:  RCALL  0014
+009A:  INCF   1A,F
+009C:  BRA    0070
+....................       } 
+009E:  GOTO   0206 (RETURN)
+....................     
+.................... } 
+.................... void kistirma(){ 
+....................     for(int sayac = dirsekAdimBuyuklugu ; sayac > 0 ; sayac--){ 
+*
+0108:  MOVFF  16,1A
+010C:  MOVF   1A,F
+010E:  BZ    0138
+....................         sayac2 = sayac%8; 
+0110:  MOVF   1A,W
+0112:  ANDLW  07
+0114:  MOVWF  17
+....................         output_c(adim2[sayac2]); 
+0116:  CLRF   03
+0118:  MOVF   17,W
+011A:  ADDLW  0C
+011C:  MOVWF  FE9
+011E:  MOVLW  00
+0120:  ADDWFC 03,W
+0122:  MOVWF  FEA
+0124:  MOVFF  FEF,1B
+0128:  CLRF   F94
+012A:  MOVFF  1B,F8B
+....................        delay_ms(50); 
+012E:  MOVLW  32
+0130:  MOVWF  1B
+0132:  RCALL  0014
+0134:  DECF   1A,F
+0136:  BRA    010C
+....................       } 
+0138:  GOTO   020E (RETURN)
+....................  
+.................... } 
+....................  
+....................  
+.................... void main() 
+*
+017A:  CLRF   FF8
+017C:  BCF    FD0.7
+017E:  MOVLW  05
+0180:  MOVWF  14
+0182:  MOVLW  28
+0184:  MOVWF  15
+0186:  MOVWF  16
+0188:  MOVLW  3C
+018A:  MOVWF  18
+018C:  MOVWF  19
+018E:  BSF    FC1.0
+0190:  BSF    FC1.1
+0192:  BSF    FC1.2
+0194:  BCF    FC1.3
+0196:  MOVLW  01
+0198:  MOVWF  04
+019A:  MOVLW  03
+019C:  MOVWF  05
+019E:  MOVLW  02
+01A0:  MOVWF  06
+01A2:  MOVLW  06
+01A4:  MOVWF  07
+01A6:  MOVLW  04
+01A8:  MOVWF  08
+01AA:  MOVLW  0C
+01AC:  MOVWF  09
+01AE:  MOVLW  08
+01B0:  MOVWF  0A
+01B2:  MOVLW  09
+01B4:  MOVWF  0B
+01B6:  MOVLW  10
+01B8:  MOVWF  0C
+01BA:  MOVLW  30
+01BC:  MOVWF  0D
+01BE:  MOVLW  20
+01C0:  MOVWF  0E
+01C2:  MOVLW  60
+01C4:  MOVWF  0F
+01C6:  MOVLW  40
+01C8:  MOVWF  10
+01CA:  MOVLW  C0
+01CC:  MOVWF  11
+01CE:  MOVLW  80
+01D0:  MOVWF  12
+01D2:  MOVLW  90
+01D4:  MOVWF  13
+.................... { 
+.................... set_tris_a(0xff); 
+01D6:  MOVLW  FF
+01D8:  MOVWF  F92
+.................... set_tris_b(0x00); 
+01DA:  MOVLW  00
+01DC:  MOVWF  F93
+.................... set_tris_c(0x00); 
+01DE:  MOVWF  F94
+.................... set_tris_d(0x00); 
+01E0:  MOVWF  F95
+.................... output_b(0x00); 
+01E2:  CLRF   F93
+01E4:  CLRF   F8A
+.................... output_c(0x00); 
+01E6:  CLRF   F94
+01E8:  CLRF   F8B
+.................... output_d(0x00); 
+01EA:  CLRF   F95
+01EC:  CLRF   F8C
+....................     
+....................  
+....................  
+....................    while(TRUE) 
+....................    { 
+....................       m1BandiCalistir(); 
+01EE:  BRA    0004
+....................       while(input(pin_A0) == 0);//sensör kutuyu algýlayana kadar bekle 
+01F0:  BSF    F92.0
+01F2:  BTFSS  F80.0
+01F4:  BRA    01F0
+....................       delay_us(200);//algýlandý 
+01F6:  MOVLW  42
+01F8:  MOVWF  00
+01FA:  DECFSZ 00,F
+01FC:  BRA    01FA
+01FE:  NOP   
+....................       BandiDurdur(); 
+0200:  RCALL  000E
+....................       dirsekAsagi(); 
+0202:  RCALL  003C
+....................       kistir(); 
+0204:  BRA    006E
+....................       dirsekYukari(); 
+0206:  RCALL  00A2
+....................       omuzIleri(); 
+0208:  BRA    00D4
+....................       dirsekAsagi(); 
+020A:  RCALL  003C
+....................       kistirma(); 
+020C:  BRA    0108
+....................        
+....................       dirsekYukari(); 
+020E:  RCALL  00A2
+....................       m3BandiCalistir(); 
+0210:  BRA    013C
+....................       omuzGeri(); 
+0212:  BRA    0146
+....................       while(input(pin_A1) == 0); 
+0214:  BSF    F92.1
+0216:  BTFSS  F80.1
+0218:  BRA    0214
+....................       delay_us(200);//algýlandý 
+021A:  MOVLW  42
+021C:  MOVWF  00
+021E:  DECFSZ 00,F
+0220:  BRA    021E
+0222:  NOP   
+....................       BandiDurdur(); 
+0224:  RCALL  000E
+0226:  BRA    01EE
+....................        
+....................        
+....................      
+....................    } 
+.................... } 
+....................  
+0228:  SLEEP 
+....................  
+
+Configuration Fuses:
+   Word  1: 2100   XT NOOSCSEN
+   Word  2: 0E0C   PUT NOBROWNOUT BORV20 NOWDT WDT128
+   Word  3: 0100   CCP2C1
+   Word  4: 0081   STVREN NOLVP NODEBUG
+   Word  5: C00F   NOPROTECT NOCPB NOCPD
+   Word  6: E00F   NOWRT NOWRTC NOWRTB NOWRTD
+   Word  7: 400F   NOEBTR NOEBTRB

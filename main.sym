@@ -1,0 +1,90 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004-00B adim
+00C-013 adim2
+014     mbirIleri
+015     mUcIleri
+016     dirsekAdimBuyuklugu
+017     sayac2
+018     omuzAdimBuyuklugu
+019     kapanmaAcisi
+01A     kistir.sayac
+01A     dirsekYukari.sayac
+01A     dirsekAsagi.sayac
+01A     omuzIleri.sayac
+01A     omuzGeri.sayac
+01A     kistirma.sayac
+01A     MAIN.@SCRATCH1
+01B     @delay_ms1.P1
+01B     omuzIleri.@SCRATCH1
+01B     omuzGeri.@SCRATCH1
+01B     dirsekAsagi.@SCRATCH1
+01B     dirsekYukari.@SCRATCH1
+01B     kistir.@SCRATCH1
+01B     kistirma.@SCRATCH1
+F83     PSP_DATA
+FBB     CCP_2_LOW
+FBB     CCP_2
+FBC     CCP_2_HIGH
+FBE     CCP_1
+FBE     CCP_1_LOW
+FBF     CCP_1_HIGH
+FE1-FE2 @READ_PACKED_MEMORY.P1
+FE1-FE2 @WRITE_PACKED_MEMORY.P2
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PACKED_MEMORY.P3
+FE9-FEA @WRITE_PROGRAM_MEMORY.P4
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+000004  m1BandiCalistir
+00000E  BandiDurdur
+000014  @delay_ms1
+00003C  dirsekAsagi
+00006E  kistir
+0000A2  dirsekYukari
+0000D4  omuzIleri
+000108  kistirma
+00013C  m3BandiCalistir
+000146  omuzGeri
+00017A  @cinit1
+00017A  MAIN
+000196  @cinit2
+
+Project Directory:
+    D:\programmerRamoFinallyStarted\PIC_C\ders\stepDcKolUygulamasý\
+
+Project Files:
+    main.c                                                  [20-May-23 15:05  CRC=33380AAB]
+    main.h                                                  [20-May-23 11:43  CRC=53DA0745]
+    ..\..\..\..\Program Files (x86)\PICC\Devices\18F452.h   [21-Haz-13 16:05  CRC=8BB2C0D6]
+
+Source signature=9E77939C
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC18F452
+    Pointer Size:   16
+    ADC Range:      0-65535
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   main.xsym
+    Errors:      main.err
+    Ext Symbols: main.esym
+    INHX32:      main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA
